@@ -1,5 +1,9 @@
 import socket
 
+# Configuration du serveur
+TCP_IP = '127.0.0.1'  # Adresse IP du serveur
+TCP_PORT = 12345  # Port du serveur
+
 
 # Fonction pour envoyer une demande au serveur et récupérer la réponse
 def send_request(request):
@@ -21,9 +25,6 @@ def send_request(request):
 
 
 if __name__ == '__main__':
-    # Configuration du serveur
-    TCP_IP = '127.0.0.1'  # Adresse IP du serveur
-    TCP_PORT = 12345  # Port du serveur
     while True:
         print("\n--- Network Clock Client ---")
         print("1. Obtenir l'heure actuelle")
