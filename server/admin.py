@@ -19,4 +19,4 @@ def run_as_admin(command_line=None, wait=True):
 
 if __name__ == "__main__":
     # Launch the privileged script with administrative privileges
-    run_as_admin(["python", "server.py"] + sys.argv[1:]);
+    run_as_admin(["python", "server.py"] + sys.argv[1:])

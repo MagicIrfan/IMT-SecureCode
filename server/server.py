@@ -1,10 +1,8 @@
 import ctypes
 import socketserver
 import datetime
-from datetime import datetime
 import platform
 
-import pywintypes
 import win32api
 
 
@@ -38,8 +36,9 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
             self.request.send("Invalid request.".encode())
 
     def handle_get_time(self, format_string):
+        print("pd")
         current_time = datetime.datetime.now()
-        formatted_time = current_time.strftime(format_string)
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
         self.request.send(formatted_time.encode())
 
     def handle_set_time(self, new_time):
@@ -96,9 +95,9 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    # Configuration du port d'écoute
-    TCP_IP = '127.0.0.1'  # Adresse IP locale
-    TCP_PORT = 12345  # Port d'écoute
+    # Get the TCP port from the configuration file
+    TCP_PORT = 12345
+    TCP_IP = '127.0.0.1'
 
     # Création du serveur
     server = socketserver.TCPServer((TCP_IP, TCP_PORT), NetworkClockRequestHandler)
