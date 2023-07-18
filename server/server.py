@@ -5,6 +5,7 @@ import win32api
 from utils.command import Command
 from utils.parser import read_config
 from systemtime import SYSTEMTIME
+import http.server
 
 
 # Classe pour gérer les demandes de clients distants
@@ -77,8 +78,9 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 if __name__ == '__main__':
     # Get the TCP port from the configuration file
     ip, port = read_config()
+    server_address = (ip, port)
     # Création du serveur
-    server = socketserver.TCPServer((ip, port), NetworkClockRequestHandler)
+    server = socketserver.ThreadingTCPServer(server_address, NetworkClockRequestHandler)
     print("Network Clock application is running.")
     try:
         server.serve_forever()
