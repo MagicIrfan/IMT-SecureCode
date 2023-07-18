@@ -1,13 +1,14 @@
 from tkinter import messagebox
 import socket
-from parser import read_config
-from networkclockapp import NCView
+from view import NCView
+from utils.command import Command
+from utils.parser import read_config
 
 
 class Client:
     def __init__(self):
         self.view = NCView()
-        self.ip, self.port = '127.0.0.1', 12345
+        self.ip, self.port = read_config()
         self.view.get_time_button.config(command=self.get_time)
         self.view.set_time_button.config(command=self.set_time)
         self.view.mainloop()
@@ -36,7 +37,7 @@ class Client:
     # Fonction pour envoyer une demande au serveur et récupérer la réponse
     def get_time(self):
         format_string = "%Y-%m-%d %H:%M:%S"
-        request = f"GET_TIME:{format_string}"
+        request = f"{Command.GET_TIME.value}:{format_string}"
         response = self.send_request(request)
         if response:
             self.view.current_time.set(response)
@@ -50,7 +51,7 @@ class Client:
         second = self.view.get_second()
 
         new_time = f"{year}-{month}-{day}-12-12-12"
-        request = f"SET_TIME:{new_time}"
+        request = f"{Command.SET_TIME.value}:{new_time}"
         response = self.send_request(request)
         if response:
             messagebox.showinfo("Changement d'heure", response)

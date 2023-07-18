@@ -1,23 +1,10 @@
-import ctypes
 import socketserver
 import datetime
 import platform
-
 import win32api
-
-
-# Define the SYSTEMTIME structure manually
-class SYSTEMTIME(ctypes.Structure):
-    _fields_ = [
-        ("wYear", ctypes.c_uint16),
-        ("wMonth", ctypes.c_uint16),
-        ("wDayOfWeek", ctypes.c_uint16),
-        ("wDay", ctypes.c_uint16),
-        ("wHour", ctypes.c_uint16),
-        ("wMinute", ctypes.c_uint16),
-        ("wSecond", ctypes.c_uint16),
-        ("wMilliseconds", ctypes.c_uint16),
-    ]
+from utils.command import Command
+from utils.parser import read_config
+from systemtime import SYSTEMTIME
 
 
 # Classe pour gérer les demandes de clients distants
@@ -26,28 +13,21 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
         request = self.request.recv(1024).decode()
 
         # Vérification de la demande
-        if request.startswith("GET_TIME"):
+        if request.startswith(Command.GET_TIME.value):
             format_string = request.split(":")[1]
             self.handle_get_time(format_string)
-        elif request.startswith("SET_TIME"):
+        elif request.startswith(Command.SET_TIME.value):
             new_time = request.split(":")[1]
             self.handle_set_time(new_time)
         else:
             self.request.send("Invalid request.".encode())
 
     def handle_get_time(self, format_string):
-        print("pd")
         current_time = datetime.datetime.now()
         formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
         self.request.send(formatted_time.encode())
 
     def handle_set_time(self, new_time):
-        """try:
-            datetime.datetime.strptime(new_time, "%Y-%m-%d %H:%M:%S")
-            # Code pour définir la date et l'heure système ici
-            self.request.send("Date and time have been set successfully.".encode())
-        except ValueError:
-            self.request.send("Invalid date and time format. Please use the format: YYYY-MM-DD HH:MM:SS".encode())"""
         try:
             # datetime.datetime.strptime(new_time, "%Y-%m-%d %H:%M:%S")
             print(new_time)
@@ -96,15 +76,10 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
 if __name__ == '__main__':
     # Get the TCP port from the configuration file
-    TCP_PORT = 12345
-    TCP_IP = '127.0.0.1'
-
+    ip, port = read_config()
     # Création du serveur
-    server = socketserver.TCPServer((TCP_IP, TCP_PORT), NetworkClockRequestHandler)
-
+    server = socketserver.TCPServer((ip, port), NetworkClockRequestHandler)
     print("Network Clock application is running.")
-
-    # Démarrage du serveur
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -1,8 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
 from tkinter import ttk
-import socket
-from parser import read_config
 
 
 class NCView(tk.Tk):
