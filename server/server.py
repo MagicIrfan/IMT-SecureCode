@@ -51,10 +51,8 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
             minute = new_time.get("minute")
             second = new_time.get("second")
             if run_as_admin(
-                    f"{os.getcwd()}\\server\\time_changer.py {dates} {hour} {minute} {second}"):
-                current_time = datetime.now()
-                formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-                response = OKResponse(f"New system time : {formatted_time}")
+                    f"{os.getcwd()}\\time_changer.py {dates} {hour} {minute} {second}"):
+                response = OKResponse("System time has changed !")
             else:
                 response = ErrorResponse("Error when changing system time")
             self.request.send(str(response).encode())

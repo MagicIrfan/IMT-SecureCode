@@ -8,7 +8,7 @@ def read_config():
     config = configparser.ConfigParser()
 
     # Read the configuration file
-    config.read('config.ini')
+    config.read('../config.ini')
 
     # Get the 'server' section
     server_section = config['server']
@@ -20,7 +20,7 @@ def read_config():
 
 
 def config_file_exists():
-    return os.path.isfile('config.ini') or os.access('config.ini', os.R_OK)
+    return os.path.isfile('../config.ini') or os.access('../config.ini', os.R_OK)
 
 
 def config_is_valid(ip, port):
