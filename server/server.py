@@ -1,3 +1,4 @@
+import json
 import socketserver
 import datetime
 import platform
@@ -6,27 +7,50 @@ from utils.command import Command
 from utils.parser import read_config
 from systemtime import SYSTEMTIME
 import http.server
+from datetime import date, datetime
+from dateutil.parser import parse
 
 
 # Classe pour gérer les demandes de clients distants
 class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        request = self.request.recv(1024).decode()
+        request_json = self.request.recv(1024).decode()
 
-        # Vérification de la demande
-        if request.startswith(Command.GET_TIME.value):
-            format_string = request.split(":")[1]
-            self.handle_get_time(format_string)
-        elif request.startswith(Command.SET_TIME.value):
-            new_time = request.split(":")[1]
-            self.handle_set_time(new_time)
-        else:
-            self.request.send("Invalid request.".encode())
+        try:
+            # Parse the JSON request
+            request_data = json.loads(request_json)
+            command = request_data.get("command")
+
+            if command == Command.GET_TIME.value:
+                format_string = request_data.get("date_format")
+                self.handle_get_time(format_string)
+            elif command == Command.SET_TIME.value:
+                new_time = request_data.get("time")
+                self.handle_set_time(new_time)
+            else:
+                self.request.send("Invalid request.".encode())
+
+        except json.JSONDecodeError:
+            self.request.send("Invalid JSON request.".encode())
 
     def handle_get_time(self, format_string):
-        current_time = datetime.datetime.now()
-        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-        self.request.send(formatted_time.encode())
+        current_time = datetime.now()
+        print(current_time)
+        if self.is_valid_date_format(format_string):
+            formatted_time = current_time.strftime(format_string)
+        else:
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Create a dictionary with the response data
+        response_data = {
+            "current_time": formatted_time
+        }
+
+        # Convert the response data to a JSON string
+        response_json = json.dumps(response_data)
+
+        # Send the JSON response
+        self.request.send(response_json.encode())
 
     def handle_set_time(self, new_time):
         try:
@@ -37,7 +61,7 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
             if platform_name == 'Windows':
                 return self.set_system_time_windows(new_time)
             else:
-                return self.set_system_time_unix(new_time)
+                return False
         except ValueError:
             print("Invalid date and time format.")
             return False
@@ -46,7 +70,10 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
     def set_system_time_windows(self, new_time):
         try:
             # Parse new_time and convert it to a SYSTEMTIME structure
-            year, month, day, hour, minute, second = map(int, new_time.split("-"))
+            year,month,day = new_time.get("date").split("-")
+            hour = new_time.get("hour")
+            minute = new_time.get("minute")
+            second = new_time.get("second")
             system_time = SYSTEMTIME(year, month, day, hour, minute, second, 0)
 
             # Call the SetSystemTime function to set the system time
@@ -63,15 +90,14 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
             print("Error:", e)
             return False
 
-    # Function to set the system time on non-Windows systems (Linux, macOS, etc.)
-    def set_system_time_unix(self, new_time):
+    def is_valid_date_format(self, date_format):
+        current_time = datetime.now()
+        formatted_time = current_time.strftime(date_format)
+
         try:
-            # Use the 'date' command to set the system time
-            import subprocess
-            subprocess.run(['date', '-s', new_time], check=True)
+            parse(formatted_time)
             return True
-        except Exception as e:
-            print("Error:", e)
+        except ValueError:
             return False
 
 

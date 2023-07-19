@@ -1,3 +1,5 @@
+import json
+from datetime import date, datetime
 from tkinter import messagebox
 import socket
 from utils.command import Command
@@ -19,6 +21,7 @@ class NCController:
         self.view.get_time_button.config(command=self.get_time)
         self.view.set_time_button.config(command=self.set_time)
         self.model.current_time.trace_add('write', self.update_time_label)
+        self.model.date_var.set(date.today().isoformat())
 
     def send_request(self, request):
         try:
@@ -43,25 +46,49 @@ class NCController:
 
     # Fonction pour envoyer une demande au serveur et récupérer la réponse
     def get_time(self):
-        format_string = "%Y-%m-%d %H:%M:%S"
-        request = f"{Command.GET_TIME.value}:{format_string}"
-        response = self.send_request(request)
-        if response:
-            self.model.current_time.set(response)
+        date_format = self.model.get_date_format()
+        # Create a dictionary with the request data
+        request_data = {
+            "command": Command.GET_TIME.value,
+            "date_format": date_format
+        }
+
+        # Convert the request data to a JSON string
+        request_json = json.dumps(request_data)
+
+        # Send the JSON request
+        response_json = self.send_request(request_json)
+
+        if response_json:
+            # Parse the JSON response
+            response_data = json.loads(response_json)
+            current_time = response_data.get("current_time")
+
+            # Update the model with the current time
+            self.model.current_time.set(current_time)
 
     def set_time(self):
-        year = self.model.get_year()
-        month = self.model.get_month()
-        day = self.model.get_day()
+        date = self.model.get_date()
         hour = self.model.get_hour()
         minute = self.model.get_minute()
         second = self.model.get_second()
+        request_data = {
+            "command": Command.SET_TIME.value,
+            "time": {
+                "date": date,
+                "hour": hour,
+                "minute": minute,
+                "second": second
+            }
+        }
+        # Convert the request data to a JSON string
+        request_json = json.dumps(request_data)
 
-        new_time = f"{year}-{month}-{day}-12-12-12"
-        request = f"{Command.SET_TIME.value}:{new_time}"
-        response = self.send_request(request)
-        if response:
-            messagebox.showinfo("Changement d'heure", response)
+        # Send the JSON request
+        response_json = self.send_request(request_json)
+
+        if response_json:
+            messagebox.showinfo("Changement d'heure", response_json)
 
     def update_time_label(self, *args):
         self.view.time_label.config(text="Heure actuelle : " + self.model.current_time.get())
