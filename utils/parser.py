@@ -1,4 +1,5 @@
 import configparser
+import os
 
 
 def read_config():
@@ -16,3 +17,7 @@ def read_config():
     port = server_section.getint('port', fallback=12345)
 
     return ip, port
+
+
+def config_file_exists():
+    return os.path.isfile('config.ini') or not os.access('config.ini', os.R_OK)

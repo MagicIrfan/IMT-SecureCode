@@ -1,4 +1,5 @@
 import tkinter as tk
+from datetime import datetime
 
 
 class NCModel:
@@ -7,8 +8,8 @@ class NCModel:
         self.hour_var = tk.IntVar()
         self.minute_var = tk.IntVar()
         self.second_var = tk.IntVar()
-        self.current_time = tk.StringVar()
         self.date_format = tk.StringVar(value="%Y-%m-%d %H:%M:%S")
+        self.current_time = tk.StringVar(value=datetime.now().strftime(self.get_date_format()))
 
     # Getters
     def get_date(self):

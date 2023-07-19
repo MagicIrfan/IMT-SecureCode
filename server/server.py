@@ -1,14 +1,11 @@
 import json
 import socketserver
 import datetime
-import platform
-import win32api
 from utils.command import Command
 from utils.parser import read_config
-from systemtime import SYSTEMTIME
-import http.server
 from datetime import date, datetime
 from dateutil.parser import parse
+from time_changer import set_time
 
 
 # Classe pour gérer les demandes de clients distants
@@ -54,41 +51,18 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle_set_time(self, new_time):
         try:
-            # datetime.datetime.strptime(new_time, "%Y-%m-%d %H:%M:%S")
-            print(new_time)
-            # Check the platform and call the appropriate function
-            platform_name = platform.system()
-            if platform_name == 'Windows':
-                return self.set_system_time_windows(new_time)
-            else:
-                return False
+            return self.set_system_time_windows(new_time)
         except ValueError:
             print("Invalid date and time format.")
             return False
         # Function to set the system time on Windows
 
     def set_system_time_windows(self, new_time):
-        try:
-            # Parse new_time and convert it to a SYSTEMTIME structure
-            year,month,day = new_time.get("date").split("-")
-            hour = new_time.get("hour")
-            minute = new_time.get("minute")
-            second = new_time.get("second")
-            system_time = SYSTEMTIME(year, month, day, hour, minute, second, 0)
+        if set_time(new_time):
+            self.request.send("oui".encode())
+        else:
+            self.request.send("non".encode())
 
-            # Call the SetSystemTime function to set the system time
-            if win32api.SetSystemTime(system_time.wYear, system_time.wMonth, 0,
-                                      system_time.wDay, system_time.wHour,
-                                      system_time.wMinute, system_time.wSecond,
-                                      system_time.wMilliseconds):
-                self.request.send("oui".encode())
-                return True
-            else:
-                self.request.send("non".encode())
-                return False
-        except Exception as e:
-            print("Error:", e)
-            return False
 
     def is_valid_date_format(self, date_format):
         current_time = datetime.now()
