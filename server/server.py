@@ -1,12 +1,20 @@
 import json
+import os
 import socketserver
 import datetime
 import sys
-from utils.config_parser import *
-from utils.date_utils import *
-from utils.admin import *
-from utils.response.ok_reponse import OKResponse
-from utils.response.error_response import ErrorResponse
+
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Ajouter le chemin du répertoire "utils" au sys.path
+utils_dir = os.path.join(parent_dir, "utils")
+response_dir = os.path.join(utils_dir, "response")
+sys.path.append(utils_dir)
+sys.path.append(response_dir)
+from config_parser import *
+from date_utils import *
+from admin import *
+from response.ok_reponse import OKResponse
+from response.error_response import ErrorResponse
 
 
 # Classe pour gérer les demandes de clients distants

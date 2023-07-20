@@ -1,4 +1,4 @@
-from utils.response.response_command import Response
+from response_command import Response
 
 
 class SetTimeCommand(Response):

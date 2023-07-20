@@ -1,11 +1,16 @@
+import os
 import sys
 
 from controller import NCController
-from utils.config_parser import *
-from utils.dep_utils import *
 
 
 if __name__ == '__main__':
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Ajouter le chemin du répertoire "utils" au sys.path
+    utils_dir = os.path.join(parent_dir, "utils")
+    sys.path.append(utils_dir)
+    from config_parser import *
+    from dep_utils import *
     if not config_file_exists():
         sys.exit(1)
     ip, port = read_config()
