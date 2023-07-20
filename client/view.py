@@ -17,6 +17,7 @@ class NCView(tk.Tk):
         calendar = Calendar(self, selectmode='day',
                             calendar_height=100,  # Adjust calendar height
                             calendar_width=100,
+                            date_pattern="yyyy-mm-dd",
                             textvariable=model.date_var)
 
         date_label = tk.Label(self, text="Date")
@@ -62,10 +63,3 @@ class NCView(tk.Tk):
         # Adjust the grid weights to center the calendar widget
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-
-        calendar.bind("<<CalendarSelected>>", self.on_calendar_selected)
-
-    def on_calendar_selected(self, event):
-        # This method will be executed when the user selects a date in the calendar
-        date_selected = event.widget.selection_get()
-        print("Date selected:", date_selected)

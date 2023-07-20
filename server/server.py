@@ -1,11 +1,12 @@
 import json
 import socketserver
 import datetime
+import sys
+
 from utils.command import Command
-from utils.parser import read_config
-from datetime import date, datetime
-from dateutil.parser import parse
-from time_changer import set_time
+from utils.config_parser import *
+from utils.date_utils import *
+from utils.admin import *
 
 
 # Classe pour gérer les demandes de clients distants
@@ -17,7 +18,6 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
             # Parse the JSON request
             request_data = json.loads(request_json)
             command = request_data.get("command")
-
             if command == Command.GET_TIME.value:
                 format_string = request_data.get("date_format")
                 self.handle_get_time(format_string)
@@ -32,8 +32,7 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle_get_time(self, format_string):
         current_time = datetime.now()
-        print(current_time)
-        if self.is_valid_date_format(format_string):
+        if is_valid_date_format(format_string):
             formatted_time = current_time.strftime(format_string)
         else:
             formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -51,37 +50,29 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle_set_time(self, new_time):
         try:
-            return self.set_system_time_windows(new_time)
+            dates = new_time.get("date")
+            hour = new_time.get("hour")
+            minute = new_time.get("minute")
+            second = new_time.get("second")
+            if run_as_admin("python {}".format(f"{os.getcwd()}\\server\\time_changer.py {dates} {hour} {minute} {second}")):
+                current_time = datetime.now()
+                formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+                self.request.send(formatted_time.encode())
         except ValueError:
             print("Invalid date and time format.")
             return False
         # Function to set the system time on Windows
 
-    def set_system_time_windows(self, new_time):
-        if set_time(new_time):
-            self.request.send("oui".encode())
-        else:
-            self.request.send("non".encode())
-
-
-    def is_valid_date_format(self, date_format):
-        current_time = datetime.now()
-        formatted_time = current_time.strftime(date_format)
-
-        try:
-            parse(formatted_time)
-            return True
-        except ValueError:
-            return False
-
 
 if __name__ == '__main__':
+    if not config_file_exists():
+        sys.exit(1)
     # Get the TCP port from the configuration file
     ip, port = read_config()
-    server_address = (ip, port)
-    # Création du serveur
-    server = socketserver.ThreadingTCPServer(server_address, NetworkClockRequestHandler)
-    print("Network Clock application is running.")
+    if not config_is_valid(ip, port):
+        sys.exit(1)
+    # Server creation
+    server = socketserver.ThreadingTCPServer((ip, port), NetworkClockRequestHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

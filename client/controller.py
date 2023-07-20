@@ -1,18 +1,17 @@
 import json
-from datetime import date, datetime
+from datetime import date
 from tkinter import messagebox
 import socket
 from utils.command import Command
-from utils.parser import read_config
 from model import NCModel
 from view import NCView
 
 
 class NCController:
-    def __init__(self):
+    def __init__(self, ip, port):
         self.view = NCView()
         self.model = NCModel()
-        self.ip, self.port = read_config()
+        self.ip, self.port = ip, port
         self.create_bindings()
         self.view.create_widgets(self.model)
         self.view.mainloop()
@@ -88,7 +87,7 @@ class NCController:
         response_json = self.send_request(request_json)
 
         if response_json:
-            messagebox.showinfo("Changement d'heure", response_json)
+            messagebox.showinfo("Time change : ", response_json)
 
     def update_time_label(self, *args):
-        self.view.time_label.config(text="Heure actuelle : " + self.model.current_time.get())
+        self.view.time_label.config(text="Current time : " + self.model.current_time.get())
