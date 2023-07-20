@@ -11,3 +11,8 @@ def is_valid_date_format(date_format):
         return True
     except ValueError:
         return False
+
+
+def get_day_of_week(date_string):
+    date_obj = datetime.strptime(date_string, "%Y-%m-%d")
+    return date_obj.weekday()

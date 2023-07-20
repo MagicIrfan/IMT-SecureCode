@@ -1,7 +1,12 @@
 import ctypes
 import sys
-
+from datetime import datetime
 import win32api
+
+
+def get_day_of_week(date_string):
+    date_obj = datetime.strptime(date_string, "%Y-%m-%d")
+    return date_obj.weekday()
 
 
 def is_dep_enabled():
@@ -32,6 +37,7 @@ class SYSTEMTIME(ctypes.Structure):
         ("wYear", ctypes.c_uint16),
         ("wMonth", ctypes.c_uint16),
         ("wDay", ctypes.c_uint16),
+        ("wDayOfWeek", ctypes.c_uint16),
         ("wHour", ctypes.c_uint16),
         ("wMinute", ctypes.c_uint16),
         ("wSecond", ctypes.c_uint16)
@@ -42,9 +48,10 @@ def set_time(date, hour, minute, second):
     try:
         # Parse new_time and convert it to a SYSTEMTIME structure
         year, month, day = date.split("-")
-        system_time = SYSTEMTIME(int(year), int(month), int(day), int(hour), int(minute), int(second))
+        system_time = SYSTEMTIME(int(year), int(month), int(day), int(get_day_of_week(date)), int(hour), int(minute),
+                                 int(second))
         # Call the SetSystemTime function to set the system time
-        if win32api.SetSystemTime(system_time.wYear, system_time.wMonth, 0,
+        if win32api.SetSystemTime(system_time.wYear, system_time.wMonth, system_time.wDayOfWeek,
                                   system_time.wDay, system_time.wHour,
                                   system_time.wMinute, system_time.wSecond,
                                   0):

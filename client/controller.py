@@ -2,8 +2,9 @@ import json
 from datetime import date
 from tkinter import messagebox
 import socket
-from utils.command import Command
 from model import NCModel
+from utils.response.get_time_command import GetTimeCommand
+from utils.response.set_time_command import SetTimeCommand
 from view import NCView
 
 
@@ -47,13 +48,10 @@ class NCController:
     def get_time(self):
         date_format = self.model.get_date_format()
         # Create a dictionary with the request data
-        request_data = {
-            "command": Command.GET_TIME.value,
-            "date_format": date_format
-        }
+        get_command = GetTimeCommand(date_format)
 
         # Convert the request data to a JSON string
-        request_json = json.dumps(request_data)
+        request_json = str(get_command)
 
         # Send the JSON request
         response_json = self.send_request(request_json)
@@ -61,33 +59,36 @@ class NCController:
         if response_json:
             # Parse the JSON response
             response_data = json.loads(response_json)
-            current_time = response_data.get("current_time")
-
-            # Update the model with the current time
-            self.model.current_time.set(current_time)
+            if response_data.get("type") == "OK":
+                current_time = response_data.get("body")
+                # Update the model with the current time
+                self.model.current_time.set(current_time)
+            elif response_data.get("type") == "ERROR":
+                messagebox.showerror("Error", response_data.get("body"))
 
     def set_time(self):
         date = self.model.get_date()
         hour = self.model.get_hour()
         minute = self.model.get_minute()
         second = self.model.get_second()
-        request_data = {
-            "command": Command.SET_TIME.value,
-            "time": {
-                "date": date,
-                "hour": hour,
-                "minute": minute,
-                "second": second
-            }
-        }
-        # Convert the request data to a JSON string
-        request_json = json.dumps(request_data)
+        set_command = SetTimeCommand(json.dumps({
+            "date": date,
+            "hour": hour,
+            "minute": minute,
+            "second": second
+        }))
+        request_json = str(set_command)
 
         # Send the JSON request
         response_json = self.send_request(request_json)
 
         if response_json:
-            messagebox.showinfo("Time change : ", response_json)
+            # Parse the JSON response
+            response_data = json.loads(response_json)
+            if response_data.get("type") == "OK":
+                messagebox.showinfo("Info", response_data.get("body"))
+            elif response_data.get("type") == "ERROR":
+                messagebox.showerror("Error", response_data.get("body"))
 
     def update_time_label(self, *args):
         self.view.time_label.config(text="Current time : " + self.model.current_time.get())

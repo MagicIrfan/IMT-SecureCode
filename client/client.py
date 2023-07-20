@@ -13,7 +13,6 @@ if __name__ == '__main__':
         sys.exit(1)
     if not is_dep_enabled():
         subscribe_to_dep()
-        print("DEP has been enabled for the current process.")
     else:
         print("DEP is already activated")
     client = NCController(ip, port)
