@@ -1,13 +1,10 @@
 from datetime import datetime
-
-import dateutil
 from dateutil.parser import parse
 
 
 def is_valid_date_format(date_format):
     current_time = datetime.now()
     formatted_time = current_time.strftime(date_format)
-
     try:
         parse(formatted_time)
         return True
@@ -17,8 +14,6 @@ def is_valid_date_format(date_format):
 
 def is_date_valid(date):
     try:
-        # Essayez de convertir la chaîne de date en objet date
-        # Si la conversion réussit, alors la date est valide, sinon elle lève une exception
         datetime.strptime(date, '%Y-%m-%d')
         return True
     except ValueError:

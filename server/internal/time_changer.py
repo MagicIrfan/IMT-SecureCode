@@ -24,7 +24,7 @@ def set_time(date_, hour_, minute_, second_):
 
 
 if __name__ == '__main__':
-    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     # Ajouter le chemin du répertoire "utils" au sys.path
     utils_dir = os.path.join(parent_dir, "utils")
     sys.path.append(utils_dir)

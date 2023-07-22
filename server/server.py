@@ -3,6 +3,7 @@ import os
 import socketserver
 import datetime
 import sys
+import http.server
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Ajouter le chemin du répertoire "utils" au sys.path
@@ -19,9 +20,13 @@ from response.error_response import ErrorResponse
 
 # Classe pour gérer les demandes de clients distants
 class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
+
+    def is_local_client(self):
+        # Check if the address is the loopback address or if it's an SSH connection
+        return self.client_address[0] in ("127.0.0.1", "localhost") or "SSH_CLIENT" in os.environ
+
     def handle(self):
         request_json = self.request.recv(1024).decode()
-
         try:
             # Parse the JSON request
             request_data = json.loads(request_json)
@@ -54,19 +59,23 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle_set_time(self, new_time):
         try:
-            dates = new_time.get("date")
-            hour = new_time.get("hour")
-            minute = new_time.get("minute")
-            second = new_time.get("second")
+            print(self.client_address)
+            if self.is_local_client():
+                dates = new_time.get("date")
+                hour = new_time.get("hour")
+                minute = new_time.get("minute")
+                second = new_time.get("second")
 
-            if is_datetime_valid(dates, hour, minute, second):
-                if run_as_admin(
-                        f"{os.getcwd()}\\time_changer.py {dates} {hour} {minute} {second}"):
-                    response = OKResponse("System time has changed !")
+                if is_datetime_valid(dates, hour, minute, second):
+                    if run_as_admin(
+                            f"{os.getcwd()}\\time_changer.py {dates} {hour} {minute} {second}"):
+                        response = OKResponse("System time has changed !")
+                    else:
+                        response = ErrorResponse("Error when changing system time")
                 else:
                     response = ErrorResponse("Error when changing system time")
             else:
-                response = ErrorResponse("Error when changing system time")
+                response = ErrorResponse("You are not authorized to perform this action")
             self.request.send(str(response).encode())
         except ValueError:
             return False

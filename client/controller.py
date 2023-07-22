@@ -6,6 +6,7 @@ from tkinter import messagebox
 import socket
 from model import NCModel
 from view import NCView
+
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Ajouter le chemin du répertoire "utils" au sys.path
 utils_dir = os.path.join(parent_dir, "utils")
@@ -13,6 +14,7 @@ response_dir = os.path.join(utils_dir, "response")
 sys.path.append(response_dir)
 from get_time_command import GetTimeCommand
 from set_time_command import SetTimeCommand
+
 
 class NCController:
     def __init__(self, ip, port):
@@ -47,7 +49,7 @@ class NCController:
             # Retour de la réponse
             return response
         except ConnectionRefusedError:
-            messagebox.showerror("Erreur de connexion", "Impossible de se connecter au serveur.")
+            messagebox.showerror("Connection error", "Unable to connect to server")
             return None
 
     # Fonction pour envoyer une demande au serveur et récupérer la réponse
