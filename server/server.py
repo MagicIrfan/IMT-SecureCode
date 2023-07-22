@@ -58,16 +58,18 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
             hour = new_time.get("hour")
             minute = new_time.get("minute")
             second = new_time.get("second")
-            if run_as_admin(
-                    f"{os.getcwd()}\\time_changer.py {dates} {hour} {minute} {second}"):
-                response = OKResponse("System time has changed !")
+
+            if is_datetime_valid(dates, hour, minute, second):
+                if run_as_admin(
+                        f"{os.getcwd()}\\time_changer.py {dates} {hour} {minute} {second}"):
+                    response = OKResponse("System time has changed !")
+                else:
+                    response = ErrorResponse("Error when changing system time")
             else:
                 response = ErrorResponse("Error when changing system time")
             self.request.send(str(response).encode())
         except ValueError:
-            print("Invalid date and time format.")
             return False
-        # Function to set the system time on Windows
 
 
 if __name__ == '__main__':
