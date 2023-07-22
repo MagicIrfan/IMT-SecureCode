@@ -59,7 +59,6 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle_set_time(self, new_time):
         try:
-            print(self.client_address)
             if self.is_local_client():
                 dates = new_time.get("date")
                 hour = new_time.get("hour")
@@ -68,7 +67,7 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
                 if is_datetime_valid(dates, hour, minute, second):
                     if run_as_admin(
-                            f"{os.getcwd()}\\time_changer.py {dates} {hour} {minute} {second}"):
+                            f"{os.getcwd()}\\internal\\time_changer.py {dates} {hour} {minute} {second}"):
                         response = OKResponse("System time has changed !")
                     else:
                         response = ErrorResponse("Error when changing system time")
