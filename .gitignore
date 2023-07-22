@@ -1,2 +1,6 @@
 .idea/
 dist/
+utils/__pycache__/
+utils/response/__pycache__/
+server/__pycache__/
+client/__pycache__/
