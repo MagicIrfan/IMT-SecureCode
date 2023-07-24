@@ -53,7 +53,6 @@ class NCController:
 
             # Réception de la réponse du serveur
             response = client_socket.recv(1024).decode()
-            #response = receive_data(client_socket)
 
             # Fermeture du socket client
             client_socket.close()
@@ -111,7 +110,6 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         request_json = self.request.recv(1024).decode()
-        #request_json = receive_data(self.request)
         try:
             # Parse the JSON request
             request_data = json.loads(request_json)
