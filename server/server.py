@@ -16,6 +16,7 @@ from date_utils import *
 from admin import *
 from response.ok_reponse import OKResponse
 from response.error_response import ErrorResponse
+from socket_utils import *
 
 
 # Classe pour gérer les demandes de clients distants
@@ -26,7 +27,7 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
         return self.client_address[0] in ("127.0.0.1", "localhost") or "SSH_CLIENT" in os.environ
 
     def handle(self):
-        request_json = self.request.recv(1024).decode()
+        request_json = recv_complete_message(self.request)
         try:
             # Parse the JSON request
             request_data = json.loads(request_json)

@@ -14,6 +14,7 @@ response_dir = os.path.join(utils_dir, "response")
 sys.path.append(response_dir)
 from get_time_command import GetTimeCommand
 from set_time_command import SetTimeCommand
+from socket_utils import *
 
 
 class NCController:
@@ -41,7 +42,7 @@ class NCController:
             client_socket.send(request.encode())
 
             # Réception de la réponse du serveur
-            response = client_socket.recv(1024).decode()
+            response = recv_complete_message(client_socket)
 
             # Fermeture du socket client
             client_socket.close()
