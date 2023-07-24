@@ -14,12 +14,8 @@ def is_dep_enabled():
 
 def subscribe_to_dep():
     try:
-        # Get a handle to the current process
-        process_handle = ctypes.windll.kernel32.GetCurrentProcess()
         # Enable DEP for the current process
         dep_enabled = ctypes.c_int(1)
         ctypes.windll.kernel32.SetProcessDEPPolicy(dep_enabled)
-        print("DEP has been enabled for the current process.")
-        ctypes.windll.kernel32.CloseHandle(process_handle)
     except Exception as e:
         print("Error subscribing to DEP:", e)

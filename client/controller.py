@@ -14,8 +14,8 @@ response_dir = os.path.join(utils_dir, "response")
 sys.path.append(response_dir)
 sys.path.append(utils_dir)
 from get_time_command import GetTimeCommand
-from set_time_command import SetTimeCommand
-from socket_utils import *
+from date_utils import is_datetime_valid
+from admin import *
 
 
 class NCController:
@@ -43,7 +43,7 @@ class NCController:
             client_socket.send(request.encode())
 
             # Réception de la réponse du serveur
-            response = recv_complete_message(client_socket)
+            response = client_socket.recv(1024).decode()
 
             # Fermeture du socket client
             client_socket.close()
@@ -81,24 +81,17 @@ class NCController:
         hour = self.model.get_hour()
         minute = self.model.get_minute()
         second = self.model.get_second()
-        set_command = SetTimeCommand(json.dumps({
-            "date": date,
-            "hour": hour,
-            "minute": minute,
-            "second": second
-        }))
-        request_json = str(set_command)
-
-        # Send the JSON request
-        response_json = self.send_request(request_json)
-
-        if response_json:
-            # Parse the JSON response
-            response_data = json.loads(response_json)
-            if response_data.get("type") == "OK":
-                messagebox.showinfo("Info", response_data.get("body"))
-            elif response_data.get("type") == "ERROR":
-                messagebox.showerror("Error", response_data.get("body"))
+        if is_datetime_valid(date, hour, minute, second):
+            server_directory = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "server")
+            internal_directory = os.path.join(server_directory, "internal")
+            time_changer_path = os.path.join(internal_directory, "time_changer.py")
+            command = f"{time_changer_path} {date} {hour} {minute} {second}"
+            if run_as_admin(command):
+                messagebox.showinfo("Information", "System time has changed !")
+            else:
+                messagebox.showerror("Error", "Error when changing system time")
+        else:
+            messagebox.showerror("Error", "Error when changing system time")
 
     def update_time_label(self, *args):
         self.view.time_label.config(text="Current time : " + self.model.current_time.get())
