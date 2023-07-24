@@ -15,13 +15,14 @@ from date_utils import *
 from admin import *
 from response.ok_reponse import OKResponse
 from response.error_response import ErrorResponse
+from socket_utils import *
 
 
 # Classe pour gérer les demandes de clients distants
 class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        request_json = self.request.recv(1024).decode()
+        request_json = receive_data(self.request)
         try:
             # Parse the JSON request
             request_data = json.loads(request_json)

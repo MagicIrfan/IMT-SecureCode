@@ -16,6 +16,7 @@ sys.path.append(utils_dir)
 from get_time_command import GetTimeCommand
 from date_utils import is_datetime_valid
 from admin import *
+from socket_utils import *
 
 
 class NCController:
@@ -43,7 +44,7 @@ class NCController:
             client_socket.send(request.encode())
 
             # Réception de la réponse du serveur
-            response = client_socket.recv(1024).decode()
+            response = receive_data(client_socket)
 
             # Fermeture du socket client
             client_socket.close()
