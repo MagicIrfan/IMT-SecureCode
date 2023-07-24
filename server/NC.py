@@ -75,7 +75,7 @@ class NCController:
 
         # Send the JSON request
         response_json = self.send_request(request_json)
-        print(response_json)
+
         if response_json:
             # Parse the JSON response
             response_data = json.loads(response_json)

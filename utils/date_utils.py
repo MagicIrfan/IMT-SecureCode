@@ -1,10 +1,12 @@
+import re
 from datetime import datetime
+
+import arrow
 
 
 def is_valid_date_format(date_format):
     try:
-        # Attempt to parse the date string using the specified format
-        datetime.strptime("2010-01-01 23:25:00", date_format)
+        datetime.strptime("2001-01-01 00:00:00", date_format)
         return True
     except ValueError:
         return False
