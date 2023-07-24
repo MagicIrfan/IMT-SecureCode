@@ -1,12 +1,10 @@
 from datetime import datetime
-from dateutil.parser import parse
 
 
 def is_valid_date_format(date_format):
-    current_time = datetime.now()
-    formatted_time = current_time.strftime(date_format)
     try:
-        parse(formatted_time)
+        # Attempt to parse the date string using the specified format
+        datetime.strptime("2010-01-01 23:25:00", date_format)
         return True
     except ValueError:
         return False
