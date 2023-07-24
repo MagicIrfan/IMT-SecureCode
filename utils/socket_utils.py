@@ -1,12 +1,16 @@
 
-def recv_complete_message(socket):
+def recv_complete_message(sock):
     # Receive data until a complete message is received
     data = b""
     while True:
-        chunk = socket.recv(1024)
+        chunk = sock.recv(1024)
         if not chunk:
             break
         data += chunk
-        message = data.decode()
-        return message
+        try:
+            message = data.decode()
+            return message
+        except UnicodeDecodeError:
+            # Incomplete message, continue receiving
+            continue
     return None

@@ -12,6 +12,7 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 utils_dir = os.path.join(parent_dir, "utils")
 response_dir = os.path.join(utils_dir, "response")
 sys.path.append(response_dir)
+sys.path.append(utils_dir)
 from get_time_command import GetTimeCommand
 from set_time_command import SetTimeCommand
 from socket_utils import *
