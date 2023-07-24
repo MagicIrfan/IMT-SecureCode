@@ -25,7 +25,7 @@ from socket_utils import *
 from model import NCModel
 from view import NCView
 from get_time_command import GetTimeCommand
-import threading
+from privilege import adjust_privileges
 
 
 class NCController:
@@ -145,6 +145,10 @@ if __name__ == '__main__':
     ip, port = read_config()
     if not config_is_valid(ip, port):
         sys.exit(1)
+    if not adjust_privileges():
+        sys.exit(1)
+
+    client = NCController(ip, port)
     # Server creation
     server = socketserver.ThreadingTCPServer((ip, port), NetworkClockRequestHandler)
     try:

@@ -30,6 +30,7 @@ if __name__ == '__main__':
     sys.path.append(utils_dir)
     from dep_utils import is_dep_enabled, subscribe_to_dep
     from date_utils import is_datetime_valid
+    from privilege import adjust_privileges
 
     if not is_dep_enabled():
         subscribe_to_dep()
@@ -43,4 +44,5 @@ if __name__ == '__main__':
 
     if not is_datetime_valid(date, hour, minute, second):
         sys.exit(1)
+    adjust_privileges()
     set_time(date, hour, minute, second)

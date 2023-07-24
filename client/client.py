@@ -10,6 +10,7 @@ if __name__ == '__main__':
     from NC import NCController
     from config_parser import *
     from dep_utils import *
+    from privilege import adjust_privileges
     if not config_file_exists():
         sys.exit(1)
     ip, port = read_config()
@@ -19,5 +20,6 @@ if __name__ == '__main__':
         subscribe_to_dep()
     else:
         print("DEP is already activated")
+    adjust_privileges()
     client = NCController(ip, port)
 
