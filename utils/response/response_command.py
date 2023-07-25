@@ -16,7 +16,7 @@ class Response(ABC):
         return self._body
 
     def __str__(self):
-        return json.dumps(self.to_json())
+        return json.dumps(self.to_json())+"\n"
 
     def to_json(self):
         return {

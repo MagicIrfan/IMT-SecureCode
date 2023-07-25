@@ -1,3 +1,4 @@
+# Read data from client and return when newline is received
 def receive_data(socket):
     # Variable to store received data
     data = b''
@@ -5,8 +6,8 @@ def receive_data(socket):
         # Receive data in chunks
         chunk = socket.recv(1024)
         if not chunk:
-            # If the chunk is empty, the client has closed the connection
-            return ''
+            # If no more data is received, the client disconnected
+            raise ConnectionResetError
 
         data += chunk
         if b'\n' in data:
