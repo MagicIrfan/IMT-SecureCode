@@ -6,6 +6,7 @@ import sys
 from datetime import date
 from tkinter import messagebox
 import socket
+import threading
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Ajouter le chemin du répertoire "utils" au sys.path
@@ -26,6 +27,11 @@ from model import NCModel
 from view import NCView
 from get_time_command import GetTimeCommand
 from privilege import adjust_privileges
+from dep_utils import *
+
+
+def start_client(_ip, _port):
+    client = NCController(_ip, _port)
 
 
 class NCController:
@@ -62,6 +68,8 @@ class NCController:
             return response
         except ConnectionRefusedError:
             messagebox.showerror("Connection error", "Unable to connect to server")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
             return None
 
     # Fonction pour envoyer une demande au serveur et récupérer la réponse
@@ -145,10 +153,13 @@ if __name__ == '__main__':
     ip, port = read_config()
     if not config_is_valid(ip, port):
         sys.exit(1)
+    if not is_dep_enabled():
+        subscribe_to_dep()
     if not adjust_privileges():
         sys.exit(1)
-
-    client = NCController(ip, port)
+    # Start the client in a separate thread
+    client_thread = threading.Thread(target=start_client, args=(ip, port))
+    client_thread.start()
     # Server creation
     server = socketserver.ThreadingTCPServer((ip, port), NetworkClockRequestHandler)
     try:

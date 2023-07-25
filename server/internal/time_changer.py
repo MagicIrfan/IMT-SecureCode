@@ -44,5 +44,6 @@ if __name__ == '__main__':
 
     if not is_datetime_valid(date, hour, minute, second):
         sys.exit(1)
-    adjust_privileges()
+    if not adjust_privileges(["SeSystemtimePrivilege", "SeTimeZonePrivilege"]):
+        sys.exit(1)
     set_time(date, hour, minute, second)
