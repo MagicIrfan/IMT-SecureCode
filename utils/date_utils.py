@@ -6,7 +6,7 @@ import arrow
 
 def is_valid_date_format(date_format):
     try:
-        datetime.strptime("2001-01-01 00:00:00", date_format)
+        datetime.strftime(datetime.now(), date_format)
         return True
     except ValueError:
         return False

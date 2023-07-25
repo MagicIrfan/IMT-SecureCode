@@ -2,6 +2,12 @@ import os
 import datetime
 import win32api
 import sys
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+utils_dir = os.path.join(parent_dir, "utils")
+sys.path.append(utils_dir)
+from dep_utils import is_dep_enabled, subscribe_to_dep
+from date_utils import is_datetime_valid
+from privilege import adjust_privileges
 
 
 def set_time(date_, hour_, minute_, second_):
@@ -24,13 +30,8 @@ def set_time(date_, hour_, minute_, second_):
 
 
 if __name__ == '__main__':
-    parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    # Ajouter le chemin du répertoire "utils" au sys.path
-    utils_dir = os.path.join(parent_dir, "utils")
-    sys.path.append(utils_dir)
-    from dep_utils import is_dep_enabled, subscribe_to_dep
-    from date_utils import is_datetime_valid
-    from privilege import adjust_privileges
+    if not adjust_privileges(["SeSystemtimePrivilege"]):
+        sys.exit(1)
 
     if not is_dep_enabled():
         subscribe_to_dep()
@@ -43,7 +44,5 @@ if __name__ == '__main__':
     second = int(sys.argv[4])
 
     if not is_datetime_valid(date, hour, minute, second):
-        sys.exit(1)
-    if not adjust_privileges(["SeSystemtimePrivilege", "SeTimeZonePrivilege"]):
         sys.exit(1)
     set_time(date, hour, minute, second)

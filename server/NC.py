@@ -147,6 +147,8 @@ class NetworkClockRequestHandler(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
+    if not adjust_privileges():
+        sys.exit(1)
     if not config_file_exists():
         sys.exit(1)
     # Get the TCP port from the configuration file
@@ -155,8 +157,6 @@ if __name__ == '__main__':
         sys.exit(1)
     if not is_dep_enabled():
         subscribe_to_dep()
-    if not adjust_privileges():
-        sys.exit(1)
     # Start the client in a separate thread
     client_thread = threading.Thread(target=start_client, args=(ip, port))
     client_thread.start()

@@ -28,7 +28,7 @@ def adjust_privileges(privileges_to_keep=None):
         token_privileges = []
         for privilege in all_privileges:
             if privilege[0] not in privileges_to_keep_ids:
-                new_state = (privilege[0], 0)  # 0 means disable the privilege
+                new_state = (privilege[0], 4)  # 4 means give up the privilege
                 token_privileges.append(new_state)
 
         # Apply the change of privileges
