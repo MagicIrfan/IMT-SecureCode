@@ -30,11 +30,10 @@ def set_time(date_, hour_, minute_, second_):
 
 
 if __name__ == '__main__':
-    if not adjust_privileges(["SeSystemtimePrivilege"]):
-        sys.exit(1)
-
     if not is_dep_enabled():
         subscribe_to_dep()
+    adjust_privileges(["SeSystemtimePrivilege"])
+
     if len(sys.argv) != 5:
         sys.exit(1)
 
