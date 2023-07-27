@@ -1,7 +1,7 @@
 # IMT-SecureCode
 ## Connexion
 
-This code has been tested on Windows
+This code has been tested on Windows.
 To start it, you need to open one terminal (on PowerShell)
 
 ### Network Clock
